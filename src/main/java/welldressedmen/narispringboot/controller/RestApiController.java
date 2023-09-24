@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import welldressedmen.narispringboot.config.auth.PrincipalDetails;
-import welldressedmen.narispringboot.model.User;
+import welldressedmen.narispringboot.domain.User;
 import welldressedmen.narispringboot.repository.UserRepository;
 
 import java.util.List;

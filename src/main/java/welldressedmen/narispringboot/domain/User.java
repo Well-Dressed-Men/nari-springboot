@@ -1,4 +1,4 @@
-package welldressedmen.narispringboot.model;
+package welldressedmen.narispringboot.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,7 +2,7 @@ package welldressedmen.narispringboot.config.auth;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import welldressedmen.narispringboot.model.User;
+import welldressedmen.narispringboot.domain.User;
 
 import java.util.ArrayList;
 import java.util.Collection;

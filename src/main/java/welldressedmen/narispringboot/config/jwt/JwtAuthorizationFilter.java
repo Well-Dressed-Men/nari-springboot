@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import welldressedmen.narispringboot.config.auth.PrincipalDetails;
-import welldressedmen.narispringboot.model.User;
+import welldressedmen.narispringboot.domain.User;
 import welldressedmen.narispringboot.repository.UserRepository;
 
 import javax.servlet.FilterChain;

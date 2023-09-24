@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import welldressedmen.narispringboot.config.jwt.JwtProperties;
 import welldressedmen.narispringboot.config.oauth.provider.GoogleUser;
 import welldressedmen.narispringboot.config.oauth.provider.OAuthUserInfo;
-import welldressedmen.narispringboot.model.User;
+import welldressedmen.narispringboot.domain.User;
 import welldressedmen.narispringboot.repository.UserRepository;
 
 import java.util.Date;
@@ -30,7 +30,7 @@ public class JwtCreateController {
 		/*
 		data - profileObj - provider ex)google
 							providerId ex)35378
-							email ex)heenam4225@gmail.com
+							email ex)heenamgoogleId@gmail.com
 							name ex)강희남
 		 */
 		OAuthUserInfo googleUser = new GoogleUser((Map<String, Object>)data.get("profileObj"));
