@@ -8,7 +8,7 @@
 /dataSources.local.xml
 
 .gradle/
-.idea/
+.idea/workspace.xml
 build/
 
 application-aws.properties
