@@ -7,11 +7,10 @@ import welldressedmen.narispringboot.Exception.TemporalErrorException;
 import static welldressedmen.narispringboot.service.WeatherService.weatherUltraShort;
 
 public class WeatherParserForUSF {
-
     public static void parseWeatherDataForUSF(String resData, short regionId) {
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
-        System.out.println("response : "+response);
+//        System.out.println("response : "+response);
         JSONObject header = response.getJSONObject("header");
         String resultCode = header.getString("resultCode");
 
@@ -44,7 +43,7 @@ public class WeatherParserForUSF {
         int row=0;
         for (int jsonIndex = 0; jsonIndex < jArray.length(); jsonIndex++) {
             JSONObject obj = jArray.getJSONObject(jsonIndex);
-            System.out.println("obj: " + obj);
+//            System.out.println("obj: " + obj);
 
             fcstDate = (short) (obj.getInt("fcstDate") % 10000); //뒤 네자리 추출
             value[row][0] = fcstDate;

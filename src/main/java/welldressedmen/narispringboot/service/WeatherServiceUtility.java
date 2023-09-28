@@ -100,4 +100,21 @@ public class WeatherServiceUtility {
         short[] stdTime = new short[]{regionId, baseDate, baseTime};
         return stdTime;
     }
+
+    static short[] getStdTimeKeyForAP(short regionId){
+        LocalDateTime now = LocalDateTime.now();
+
+        /*
+        정시 발표자료를
+        정시부터 제공(확인 필요)(API명세에는 따로 언급X)
+         */
+
+        short hour = (short)now.getHour();
+        short min = 0;
+
+        short baseDate = Short.parseShort(now.format(DateTimeFormatter.ofPattern("MMdd")));
+        short baseTime = (short)(hour*100+min);
+        short[] stdTime = new short[]{regionId, baseDate, baseTime};
+        return stdTime;
+    }
 }

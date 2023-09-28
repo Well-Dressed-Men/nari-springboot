@@ -100,35 +100,4 @@ public class WeatherParserForMFT {
         }
         return stdTime.toLocalDate();
     }
-
-    static short changeToWeatherCode(String skyAm){
-        switch(skyAm){
-            case "맑음" :
-                return 10;
-            case "소나기" :
-                return 14;
-            //15, 16, 17 코드는 단기예보->WM(중기날씨정보)에서만 추출할 수 있는 정보로 MFT파싱에서는 해당 코드를 return하지 않는다.
-            case "구름많음" :
-                return 30;
-            case "구름많고 비" :
-                return 31;
-            case "구름많고 눈" :
-                return 32;
-            case "구름많고 비/눈" :
-                return 33;
-            case "구름많고 소나기" :
-                return 34;
-            case "흐림" :
-                return 40;
-            case "흐리고 비" :
-                return 41;
-            case "흐리고 눈" :
-                return 42;
-            case "흐리고 비/눈" :
-                return 43;
-            case "흐리고 소나기" :
-                return 44;
-        }
-        return -1; //error
-    };
 }

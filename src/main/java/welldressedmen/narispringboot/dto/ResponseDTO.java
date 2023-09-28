@@ -7,5 +7,6 @@ import lombok.Getter;
 @Getter
 public class ResponseDTO {
     private WeatherResponse weatherResponse;
+    private String version;
     private String message;
 }

@@ -11,7 +11,7 @@ public class WeatherParserForUSN {
     public static void parseWeatherDataForUSN(String resData, short regionId){
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
-        System.out.println("response : "+response);
+//        System.out.println("response : "+response);
         JSONObject header = response.getJSONObject("header");
         String resultCode = header.getString("resultCode");
 
@@ -35,7 +35,7 @@ public class WeatherParserForUSN {
 
         for(int i = 0; i < jArray.length(); i++) {
             JSONObject obj = jArray.getJSONObject(i);
-            System.out.println("obj: " + obj);
+//            System.out.println("obj: " + obj);
 
             key[0] = regionId;
             baseDate = (short) (obj.getInt("baseDate") % 10000); //뒤 네자리 추출

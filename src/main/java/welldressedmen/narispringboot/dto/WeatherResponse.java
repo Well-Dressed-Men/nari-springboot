@@ -17,6 +17,7 @@ public class WeatherResponse {
     private List<Weather.UltraShort> weatherUltraShort;
     private List<Weather.Short> weatherShort;
     private List<Weather.Mid> weatherMid;
+    private List<Weather.AP> weatherAP;
 
 //    private Double temp; // 온도
 //

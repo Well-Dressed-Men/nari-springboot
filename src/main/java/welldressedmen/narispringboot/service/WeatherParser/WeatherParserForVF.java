@@ -1,5 +1,6 @@
 package welldressedmen.narispringboot.service.WeatherParser;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import welldressedmen.narispringboot.Exception.TemporalErrorException;
@@ -11,16 +12,20 @@ import java.time.format.DateTimeFormatter;
 
 import static welldressedmen.narispringboot.service.WeatherService.*;
 
-
+@Slf4j
 public class WeatherParserForVF {
     public static void parseWeatherDataForVF(String resData, short regionId) {
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
-        System.out.println("response : "+response);
+//        System.out.println("response : "+response);
         JSONObject header = response.getJSONObject("header");
         String resultCode = header.getString("resultCode");
+        String resultMsg = header.getString("resultMsg");
 
-        if(!resultCode.equals("00")) throw new TemporalErrorException();
+        if(!resultCode.equals("00")){
+            log.info("resultCode = {}, resultMsg = {}", resultCode, resultMsg);
+            throw new TemporalErrorException();
+        }
         /*
             예외 발생 가능
             response = {"header":{"resultCode":"03","resultMsg":"NO_DATA"}} - 발생상황 : 일시적 발생 가능 오류
@@ -81,7 +86,7 @@ public class WeatherParserForVF {
         for (int jsonIndex = 0; jsonIndex < jArray.length(); jsonIndex++) {
 
             JSONObject obj = jArray.getJSONObject(jsonIndex);
-            System.out.println("obj: " + obj);
+//            System.out.println("obj: " + obj);
 
             if(jsonIndex%12==0){ //특정 시각에 관한 예측값을 모두 저장했을때, 다음 시각정보를 저장
                 fcstDate = (short) (obj.getInt("fcstDate") % 10000);

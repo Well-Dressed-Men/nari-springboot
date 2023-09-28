@@ -38,7 +38,6 @@ public class WeatherParserForMFL {
         key[2] = baseTime;
 
         JSONObject obj = jArray.getJSONObject(0);
-        System.out.println("obj: " + obj);
 
         //value설정
         setFcstDateForMF(value); //value배열에 예보날짜 정보 세팅

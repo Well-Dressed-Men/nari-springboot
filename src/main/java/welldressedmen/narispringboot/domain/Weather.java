@@ -49,4 +49,16 @@ public class Weather {
         private short tempHighest; //최고기온
 
     }
+
+    @Data
+    @AllArgsConstructor
+    @Builder
+    public static class AP { //대기오염정보조회 정보 담는 객체
+        private short fcstDate; //예보날짜
+        private short fcstTime; //예보시각
+
+        private short pm10Value; //미세먼지
+        private short pm25Value; //초미세먼지
+
+    }
 }
