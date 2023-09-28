@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Data
@@ -19,20 +17,32 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    @Column(unique = true)
-    private String username;
-    private String password;
-    private String email;
-    private String roles;
-    private String providerId;
-    private String provider;
+    @Column(name = "user_idx")
+    private long userIdx;
 
-    // ENUM으로 안하고 ,로 해서 구분해서 ROLE을 입력 -> 그걸 파싱!!
-    public List<String> getRoleList(){
-        if(this.roles.length() > 0){
-            return Arrays.asList(this.roles.split(","));
+    @Column(unique = true)
+    private String userId; //[provider]+_+[providerID] ex : google_35363453655346
+
+    private String userPwd;
+
+    private String userEmail;
+
+    private String userProviderId;
+    private String userProvider;
+
+    @OneToMany(mappedBy = "user") //-> 그림 : (일대다 그림), 읽기 : 관계노예 컬럼
+    private Set<UserPreference> userPreferences = new HashSet<>();
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_idx"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> userRoles = new HashSet<>();
+
+    public List<String> getRoleList() {
+        List<String> roles = new ArrayList<>();
+        for (Role role : this.userRoles) {
+            roles.add(role.getRoleName());
         }
-        return new ArrayList<>();
+        return roles;
     }
 }

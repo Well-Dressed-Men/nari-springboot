@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import welldressedmen.narispringboot.config.jwt.JwtProperties;
 import welldressedmen.narispringboot.config.oauth.provider.GoogleUser;
 import welldressedmen.narispringboot.config.oauth.provider.OAuthUserInfo;
+import welldressedmen.narispringboot.domain.Role;
 import welldressedmen.narispringboot.domain.User;
 import welldressedmen.narispringboot.repository.UserRepository;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,29 +36,32 @@ public class JwtCreateController {
 
 
 		//해당 사용자의 정보가 DB에 있는지 확인(for 최초로그인 여부 확인)
-		User userEntity = userRepository.findByUsername(googleUser.getProvider()+"_"+googleUser.getProviderId());
+		User userEntity = userRepository.findByUserId(googleUser.getProvider()+"_"+googleUser.getProviderId());
 
 		//상황 : 최초로그인
 		if(userEntity == null) {
 			System.out.println("userEntity == null -> 최초로그인");
 			User userRequest = User.builder()
-					.username(googleUser.getProvider()+"_"+googleUser.getProviderId())
-					.password(null)
-					.email(googleUser.getEmail())
-					.provider(googleUser.getProvider())
-					.providerId(googleUser.getProviderId())
-					.roles("ROLE_USER")
+					.userId(googleUser.getProvider()+"_"+googleUser.getProviderId())
+					.userPwd(null)
+					.userEmail(googleUser.getEmail())
+					.userProvider(googleUser.getProvider())
+					.userProviderId(googleUser.getProviderId())
 					.build();
-			
+
+			Set<Role> roles = new HashSet<>();
+			roles.add(Role.ROLE_USER);
+			userRequest.setUserRoles(roles);
+
 			userEntity = userRepository.save(userRequest);
 		}
 
 		//토큰 생성
 		String jwtToken = JWT.create()
-				.withSubject(userEntity.getUsername())
+				.withSubject(userEntity.getUserId())
 				.withExpiresAt(new Date(System.currentTimeMillis()+ JwtProperties.EXPIRATION_TIME))
-				.withClaim("id", userEntity.getId())
-				.withClaim("username", userEntity.getUsername())
+				.withClaim("id", userEntity.getUserIdx())
+				.withClaim("username", userEntity.getUserId())
 				.sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
 		Date tokenExpired = new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME);

@@ -8,10 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import welldressedmen.narispringboot.config.auth.PrincipalDetails;
+import welldressedmen.narispringboot.domain.Role;
 import welldressedmen.narispringboot.domain.User;
 import welldressedmen.narispringboot.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static welldressedmen.narispringboot.domain.Role.*;
 
 @RestController
 @RequiredArgsConstructor 
@@ -30,10 +35,10 @@ public class RestApiController {
 	@GetMapping("user")
 	public String user(Authentication authentication) { //JWT사용시, UserDetailsService호출X -> @AuthenticationPrincipal 사용 불가능
 		PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-		System.out.println("id : "+principal.getUser().getId());
-		System.out.println("username : "+principal.getUser().getUsername());
-		System.out.println("password : "+principal.getUser().getPassword());
-		System.out.println("roles : "+principal.getUser().getRoles());
+		System.out.println("id : "+principal.getUser().getUserIdx());
+		System.out.println("username : "+principal.getUser().getUserId());
+		System.out.println("password : "+principal.getUser().getUserPwd());
+		System.out.println("roles : "+principal.getUser().getUserRoles());
 		return "user";
 	}
 	
@@ -48,11 +53,14 @@ public class RestApiController {
 	public List<User> users(){
 		return userRepository.findAll();
 	}
-	
+
+	// for 추후 일반 회원가입
 	@PostMapping("join")
 	public String join(@RequestBody User user) {
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setRoles("ROLE_USER");
+		user.setUserPwd(bCryptPasswordEncoder.encode(user.getUserPwd()));
+		Set<Role> roles = new HashSet<>();
+		roles.add(ROLE_USER);
+		user.setUserRoles(roles);
 		userRepository.save(user);
 		return "회원가입완료";
 	}

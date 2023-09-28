@@ -50,7 +50,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 		//상황 : 검증완료 상황
 		if (username != null) {
-			User user = userRepository.findByUsername(username);
+			User user = userRepository.findByUserId(username);
 
 			// 권한부여를 위해 시큐리티 세션에 저장(인증은 토큰으로 이미 검증됨)(-> Controller에서 DI하여 사용 가능)
 			PrincipalDetails principalDetails = new PrincipalDetails(user); //DB사용자 정보로 PrincipalDetails객체 생성

@@ -19,5 +19,4 @@ public class Region {
 
     private String stationName; //관측소
 
-
 }

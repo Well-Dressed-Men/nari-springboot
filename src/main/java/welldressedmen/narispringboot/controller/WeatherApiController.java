@@ -23,7 +23,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class WeatherApiController {
     @Autowired
@@ -32,7 +32,7 @@ public class WeatherApiController {
     @Value("${app.version}")
     private String appVersion;
 
-    @GetMapping("weather-clothihng-infos")
+    @GetMapping("weather-clothing-infos")
     @Transactional
     public ResponseEntity<ResponseDTO> getTotalInfo(@RequestParam short regionId, @RequestParam short nx, @RequestParam short ny, @RequestParam String midLandCode, @RequestParam String midTempCode, @RequestParam String stationName, @RequestParam String ver) throws IOException {
 
@@ -60,13 +60,14 @@ public class WeatherApiController {
                 .weatherAP(WAP)
                 .build();
 
+//        weatherService.getFashion();
+
         ResponseDTO responseDTO = ResponseDTO.builder()
                 .weatherResponse(response)
                 .version(appVersion)
                 .message("날씨 정보 요청 성공")
                 .build();
 
-//        weatherService.getFashion();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
