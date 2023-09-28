@@ -40,13 +40,14 @@ public class WeatherParserForAP {
         JSONObject firstObj = items.getJSONObject(0);
         key[0] = regionId;
 
-        log.info("AP stdTime : {}", firstObj.getString("dataTime"));
+        log.info("대기오염정보조회 제공시간 : {}", firstObj.getString("dataTime"));
         String date = firstObj.getString("dataTime").split(" ")[0];
         short baseDate = (short) (Integer.parseInt(date.split("-")[1])*100+Integer.parseInt(date.split("-")[2])); //"2023-09-27" -> 927
         key[1] = baseDate;
 
         String time = firstObj.getString("dataTime").split(" ")[1];
-        short baseTime = (short) (Integer.parseInt(time.split(":")[0])*100+Integer.parseInt(time.split(":")[1])); // "19:00" -> 1900, 값 경우의수(4종류) : 0, 30, 100, 2330
+        int hour = time.split(":")[0].equals("24") ? 0 : Integer.parseInt(time.split(":")[0]);
+        short baseTime = (short) (hour*100+Integer.parseInt(time.split(":")[1])); // "19:00" -> 1900, 값 경우의수(4종류) : 0, 30, 100, 2330
         key[2] = baseTime;
 
         //value 설정
