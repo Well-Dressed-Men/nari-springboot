@@ -1,6 +1,7 @@
 package welldressedmen.narispringboot.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import welldressedmen.narispringboot.domain.Weather;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 import static welldressedmen.narispringboot.service.WeatherService.*;
 import static welldressedmen.narispringboot.service.WeatherServiceUtility.*;
 
-
+@Slf4j
 public class WeatherResponseSet {
     /*
         현재~현재로부터 6시간후 초단기날씨정보를(시간별 기온, 강수량, 풍속, 습도, 하늘상태, 강수확률) 전달하기위한 리스트 생성
@@ -184,8 +185,10 @@ public class WeatherResponseSet {
 
         //대기오염정보 조회를 통해 weatherAP에 저장한 정보를 객체에 담아서 리스트에 저장
         short[] searchKeyForAP = getStdTimeKeyForAP(regionId);
+        boolean find = false;
         for(short[] key : weatherAP.keySet()){
             if(arrEquals(searchKeyForAP, key)){
+                find = true;
                 short[][] values = weatherAP.get(key);
 
                 short[] value = values[0]; //Weather.AP 세팅
@@ -198,6 +201,28 @@ public class WeatherResponseSet {
                 result.add(item);
             }
         }
+        if(!find){
+            log.info("이전시각 대기오염정보 조회 자료 가져옴");
+            //이전 시각 자료 가져옴
+            searchKeyForAP = getSubsequentTimeKeyForAP(regionId);
+            for(short[] key : weatherAP.keySet()){
+                if(arrEquals(searchKeyForAP, key)){
+                    short[][] values = weatherAP.get(key);
+
+                    short[] value = values[0]; //Weather.AP 세팅
+                    Weather.AP item = Weather.AP.builder()
+                            .fcstDate(value[0])
+                            .fcstTime(value[1])
+                            .pm10Value(value[2])
+                            .pm25Value(value[3])
+                            .build();
+                    result.add(item);
+                }
+            }
+        }
+
+
+
         return result;
     };
 }

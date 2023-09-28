@@ -18,7 +18,7 @@ public class WeatherParserForAP {
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
 
-        log.info("[in WeatherParserForAP] response = {}", response);
+//        log.info("[in WeatherParserForAP] response = {}", response);
 
         JSONObject header = response.getJSONObject("header");
         String resultCode = header.getString("resultCode");
@@ -40,6 +40,7 @@ public class WeatherParserForAP {
         JSONObject firstObj = items.getJSONObject(0);
         key[0] = regionId;
 
+        log.info("AP stdTime : {}", firstObj.getString("dataTime"));
         String date = firstObj.getString("dataTime").split(" ")[0];
         short baseDate = (short) (Integer.parseInt(date.split("-")[1])*100+Integer.parseInt(date.split("-")[2])); //"2023-09-27" -> 927
         key[1] = baseDate;

@@ -1,5 +1,6 @@
 package welldressedmen.narispringboot.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import welldressedmen.narispringboot.domain.Region;
@@ -18,6 +19,7 @@ import static welldressedmen.narispringboot.service.WeatherResponseSet.*;
 import static welldressedmen.narispringboot.service.WeatherServiceUtility.*;
 
 @Service
+@Slf4j
 public class WeatherService {
     public static Map<short[], short[][]> weatherUltraShort = new ConcurrentHashMap<>(); // key : 지역고유번호, 발표날짜, 발표시각
                                                                                          // value : 예보날짜, 예보시간, 기온, 강수량, 풍속, 습도, 강수형태+하늘, 강수확률
@@ -44,6 +46,7 @@ public class WeatherService {
         List<Weather.Short> WS = createShortWeatherList(region.getId()); // 단기 날씨정보 세팅
         List<Weather.Mid> WM = createMidWeatherList(region.getId()); // 중기 예보 세팅
         List<Weather.AP> WAP = createAirPollutionList(region.getId()); // 미세먼지 정보 세팅
+        log.info("weatherAP = {}", WAP);
 
         Map<String, Object> result = new HashMap<>();
         result.put("weatherUltraShort", WUS);

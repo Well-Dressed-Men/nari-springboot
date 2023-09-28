@@ -5,36 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1fb2774-645f-4955-b1c5-2a67a81a7709" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.2.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.2.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.2.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.2.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.2.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.2.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.2.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.2.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.2.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.2.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/config/auth/PrincipalDetails.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/config/auth/PrincipalDetails.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/config/jwt/JwtAuthorizationFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/config/jwt/JwtAuthorizationFilter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/controller/JwtCreateController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/controller/JwtCreateController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/controller/RestApiController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/controller/RestApiController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/controller/WeatherApiController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/controller/WeatherApiController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/domain/User$UserBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/domain/User$UserBuilder.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/domain/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/domain/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/repository/UserRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SwaggerConfig.class.uniqueId0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherParser/WeatherParserForAP.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherParser/WeatherParserForAP.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherResponseSet.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherResponseSet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherServiceUtility.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/welldressedmen/narispringboot/service/WeatherServiceUtility.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/config/auth/PrincipalDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/config/auth/PrincipalDetails.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/config/jwt/JwtAuthorizationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/config/jwt/JwtAuthorizationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/controller/JwtCreateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/controller/JwtCreateController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/controller/RestApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/controller/RestApiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/controller/WeatherApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/controller/WeatherApiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/domain/Region.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/domain/Region.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/domain/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/domain/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherParser/WeatherParserForAP.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherParser/WeatherParserForAP.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherResponseSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherResponseSet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherServiceUtility.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/service/WeatherServiceUtility.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,27 +59,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/Users/heenamkang/dev/Spring/nari-springboot/src/main/java/welldressedmen/narispringboot/domain",
-    "nodejs_package_manager_path": "npm",
-    "spring.configuration.checksum": "2d54eb681fb9f1627d5c0be599a603ba"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/heenamkang/dev/Spring/nari-springboot/src/main/java/welldressedmen/narispringboot/domain&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;2d54eb681fb9f1627d5c0be599a603ba&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/welldressedmen/narispringboot/domain" />
@@ -122,7 +113,9 @@
       <workItem from="1695566189101" duration="1868000" />
       <workItem from="1695634487005" duration="623000" />
       <workItem from="1695795987809" duration="16752000" />
-      <workItem from="1695881087596" duration="13094000" />
+      <workItem from="1695881087596" duration="14060000" />
+      <workItem from="1695900434111" duration="1722000" />
+      <workItem from="1695908131069" duration="2574000" />
     </task>
     <servers />
   </component>

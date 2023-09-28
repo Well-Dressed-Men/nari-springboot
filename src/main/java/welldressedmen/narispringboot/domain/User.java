@@ -30,6 +30,8 @@ public class User {
     private String userProviderId;
     private String userProvider;
 
+    private String userSex;
+
     @OneToMany(mappedBy = "user") //-> 그림 : (일대다 그림), 읽기 : 관계노예 컬럼
     private Set<UserPreference> userPreferences = new HashSet<>();
 

@@ -117,4 +117,18 @@ public class WeatherServiceUtility {
         short[] stdTime = new short[]{regionId, baseDate, baseTime};
         return stdTime;
     }
+
+    //정시 이전시각 자료
+    static short[] getSubsequentTimeKeyForAP(short regionId){
+        LocalDateTime now = LocalDateTime.now();
+        now = now.minusHours(1);
+
+        short hour = (short)now.getHour();
+        short min = 0;
+
+        short baseDate = Short.parseShort(now.format(DateTimeFormatter.ofPattern("MMdd")));
+        short baseTime = (short)(hour*100+min);
+        short[] stdTime = new short[]{regionId, baseDate, baseTime};
+        return stdTime;
+    }
 }
