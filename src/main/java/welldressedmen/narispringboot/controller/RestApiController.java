@@ -47,12 +47,8 @@ public class RestApiController {
         //사용자 정보를 saveRequestDTO에 설정
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         String userId = principal.getUsername(); //PrincipalDetails는 UserDetils를 상속받기때문에 userId정보를 getUsername으로 얻어야함
-        try {
-            String principalJson = objectMapper.writeValueAsString(principal);
-            log.info("principal JSON = {}", principalJson);
-        } catch (Exception e) {
-            log.error("Error converting principal to JSON", e);
-        }
+        log.info("principal = {}", principal);
+        log.info("principal = {}", userId);
 
         //userSex, userCold, userHot, userPreferences를 저장
         userService.updateMemberInfo(updateRequestDTO, userId);
