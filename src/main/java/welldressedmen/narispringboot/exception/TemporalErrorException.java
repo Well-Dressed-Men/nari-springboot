@@ -1,4 +1,4 @@
-package welldressedmen.narispringboot.Exception;
+package welldressedmen.narispringboot.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

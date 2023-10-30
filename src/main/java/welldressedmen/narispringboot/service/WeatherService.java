@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import welldressedmen.narispringboot.domain.Region;
 import welldressedmen.narispringboot.domain.Weather;
+import welldressedmen.narispringboot.dto.WeatherInfo;
 import welldressedmen.narispringboot.service.WeatherParser.*;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class WeatherService {
 
     @Value("${weatherApi.serviceKey}")
     private String serviceKey;
-    public Map<String, Object> getRegionWeather(Region region) throws IOException{
+    public WeatherInfo getRegionWeather(Region region) throws IOException{
         getUSN(region, serviceKey);
         getUSF(region, serviceKey);
         getVF(region, serviceKey);
@@ -46,22 +47,15 @@ public class WeatherService {
         List<Weather.Short> WS = createShortWeatherList(region.getId()); // 단기 날씨정보 세팅
         List<Weather.Mid> WM = createMidWeatherList(region.getId()); // 중기 예보 세팅
         List<Weather.AP> WAP = createAirPollutionList(region.getId()); // 미세먼지 정보 세팅
-        log.info("weatherAP = {}", WAP);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("weatherUltraShort", WUS);
-        result.put("weatherShort", WS);
-        result.put("weatherMid", WM);
-        result.put("weatherAP", WAP);
-
-        return result;
+        return WeatherInfo.builder()
+                .weatherUltraShort(WUS)
+                .weatherShort(WS)
+                .weatherMid(WM)
+                .weatherAP(WAP)
+                .build();
     }
 
-    /*
-    public ResponseEntity<WeatherResponseDTO> getFashion(@RequestParam Long regionId){
-
-    }
-     */
     static void getUSN(Region region, String serviceKey) throws IOException {
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "USN")) return;

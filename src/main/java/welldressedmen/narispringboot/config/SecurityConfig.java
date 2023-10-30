@@ -10,13 +10,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import welldressedmen.narispringboot.config.jwt.JwtAuthorizationFilter;
-import welldressedmen.narispringboot.repository.UserRepository;
+import welldressedmen.narispringboot.repository.MemberRepository;
 
 @Configuration
 @EnableWebSecurity // 시큐리티 활성화 -> 기본 스프링 필터체인에 등록
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
-	private UserRepository userRepository;
+	private MemberRepository memberRepository;
 	@Autowired
 	private CorsConfig corsConfig;
     @Bean
@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 				.formLogin().disable() //Rest API 의 형식으로 Json 으로만 데이터를 주고 받는 Stateless 한 통신방식을 사용할 예정이기 때문
 				.httpBasic().disable()
 
-				.addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository)) //순서가 정해져있는 스프링필터를 상속받는 경우 -> addFilter(), 순서가 정해져있지 않는 스프링필터를 상속받는 경우 -> addFilterBefore(), addFilterAfter()
+				.addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository)) //순서가 정해져있는 스프링필터를 상속받는 경우 -> addFilter(), 순서가 정해져있지 않는 스프링필터를 상속받는 경우 -> addFilterBefore(), addFilterAfter()
 
 				.authorizeRequests()
 				.antMatchers("/user/**")

@@ -8,8 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import welldressedmen.narispringboot.config.auth.PrincipalDetails;
-import welldressedmen.narispringboot.domain.User;
-import welldressedmen.narispringboot.repository.UserRepository;
+import welldressedmen.narispringboot.domain.Member;
+import welldressedmen.narispringboot.repository.MemberRepository;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,10 +23,10 @@ import java.io.IOException;
 // - 토큰 검증(ifO) / 다음 필터 넘어가기(ifX)
 // - 시큐리티 세션에 사용자 정보 등록(Authentication 객체 삽입)
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-	private UserRepository userRepository;
-	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+	private MemberRepository memberRepository;
+	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepository memberRepository) {
 		super(authenticationManager);
-		this.userRepository = userRepository;
+		this.memberRepository = memberRepository;
 	}
 
 	@Override
@@ -50,10 +50,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 		//상황 : 검증완료 상황
 		if (username != null) {
-			User user = userRepository.findByUserId(username);
+			Member member = memberRepository.findByMemberId(username).get();
 
 			// 권한부여를 위해 시큐리티 세션에 저장(인증은 토큰으로 이미 검증됨)(-> Controller에서 DI하여 사용 가능)
-			PrincipalDetails principalDetails = new PrincipalDetails(user); //DB사용자 정보로 PrincipalDetails객체 생성
+			PrincipalDetails principalDetails = new PrincipalDetails(member); //DB사용자 정보로 PrincipalDetails객체 생성
 			// 인증되지 않은 상태로 생성됨(Authentication manager에 의해 인증과정을 맞춘뒤 '인증된'새로운 Authentication객체가 생성)
 			Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
 					null, // 패스워드 삽입X(해당 토큰으로는 인증에 사용되지 않음, jwt토큰에 의해 이미 검증, 인증되지 않은 Authentication객체 생성되도 상관X)
@@ -62,8 +62,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			//'능동적으로'시큐리티세션에 접근후 인증객체 저장(vs UserDetailService loadUserByUsername : return UserDetails시 자동으로 시큐리티세션에 저장)
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
-
 		chain.doFilter(request, response); //다음 필터 이동
 	}
-
 }

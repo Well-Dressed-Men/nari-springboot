@@ -3,6 +3,7 @@ package welldressedmen.narispringboot.controller;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,16 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 import welldressedmen.narispringboot.config.jwt.JwtProperties;
 import welldressedmen.narispringboot.config.oauth.provider.GoogleUser;
 import welldressedmen.narispringboot.config.oauth.provider.OAuthUserInfo;
-import welldressedmen.narispringboot.domain.Role;
-import welldressedmen.narispringboot.domain.User;
-import welldressedmen.narispringboot.repository.UserRepository;
+import welldressedmen.narispringboot.domain.Member;
+import welldressedmen.narispringboot.repository.MemberRepository;
 
 import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class JwtCreateController {
-	private final UserRepository userRepository;
+	private final MemberRepository memberRepository;
 
 	// 발동상황 : 프론트에서 Oauth2.0 로그인 성공이후 사용자 정보를 SpringAPI로 전달
 	@PostMapping("/oauth/jwt/google")
@@ -34,41 +35,58 @@ public class JwtCreateController {
 		 */
 		OAuthUserInfo googleUser = new GoogleUser((Map<String, Object>)data.get("profileObj"));
 
-
 		//해당 사용자의 정보가 DB에 있는지 확인(for 최초로그인 여부 확인)
-		User userEntity = userRepository.findByUserId(googleUser.getProvider()+"_"+googleUser.getProviderId());
+		Optional<Member> userOptionalEntity = memberRepository.findByMemberId(googleUser.getProvider()+"_"+googleUser.getProviderId());
 
-		//상황 : 최초로그인
-		if(userEntity == null) {
-			System.out.println("userEntity == null -> 최초로그인");
-			User userRequest = User.builder()
-					.userId(googleUser.getProvider()+"_"+googleUser.getProviderId())
-					.userPwd(null)
-					.userEmail(googleUser.getEmail())
-					.userProvider(googleUser.getProvider())
-					.userProviderId(googleUser.getProviderId())
-					.build();
+		Member memberEntity;
 
-			Set<Role> roles = new HashSet<>();
-			roles.add(Role.ROLE_USER);
-			userRequest.setUserRoles(roles);
+		// 상황 : 최초로그인
+		if(userOptionalEntity.isEmpty()) {
+			log.info("userEntity == null -> 최초로그인");
+			Member memberRequest = buildUser(googleUser);
 
-			userEntity = userRepository.save(userRequest);
+			memberEntity = memberRepository.save(memberRequest);
+		} else {
+			memberEntity = userOptionalEntity.get();
 		}
 
+		Map<String, String> responseMap = createToken(memberEntity);
+
+		return ResponseEntity.ok(responseMap); //생성한 JWT토큰을 프론트로 반환 by ResponseEntity사용해서 JSON형태
+
+	}
+
+	static Member buildUser(OAuthUserInfo googleUser){
+
+		return Member.builder()
+				.memberId(googleUser.getProvider()+"_"+googleUser.getProviderId())
+				.memberPwd(null)
+				.memberEmail(googleUser.getEmail())
+				.memberProvider(googleUser.getProvider())
+				.memberProviderId(googleUser.getProviderId())
+				.memberRoles("ROLE_USER")
+				.build();
+	}
+
+	static Map<String, String> createToken(Member memberEntity){
 		//토큰 생성
 		String jwtToken = JWT.create()
-				.withSubject(userEntity.getUserId())
+				.withSubject(memberEntity.getMemberId())
 				.withExpiresAt(new Date(System.currentTimeMillis()+ JwtProperties.EXPIRATION_TIME))
-				.withClaim("id", userEntity.getUserIdx())
-				.withClaim("username", userEntity.getUserId())
+				.withClaim("id", memberEntity.getMemberIdx())
+				.withClaim("username", memberEntity.getMemberId())
 				.sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
 		Date tokenExpired = new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME);
 		System.out.println("토큰 만료시간 : "+tokenExpired);
 		System.out.println("토큰 : "+jwtToken);
 
-		/*
+		Map<String, String> responseMap = new HashMap<>();
+		responseMap.put("jwtToken", jwtToken);
+		return responseMap;
+	}
+}
+/*
 		refreshToken 기능 보류
 
 		String refreshToken = JWT.create()
@@ -77,11 +95,3 @@ public class JwtCreateController {
 				.withClaim("id", userEntity.getId())
 				.sign(Algorithm.HMAC512(JwtProperties.REFRESH_SECRET)); // 다른 secret을 사용하여 토큰을 서명
 		 */
-
-		Map<String, String> responseMap = new HashMap<>();
-		responseMap.put("jwtToken", jwtToken);
-
-		// ResponseEntity를 사용하여 JSON 형태로 응답 반환
-		return ResponseEntity.ok(responseMap); //생성한 JWT토큰을 프론트로 반환
-	}
-}

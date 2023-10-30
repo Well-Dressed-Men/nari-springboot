@@ -7,16 +7,13 @@ import java.util.Map;
 public class WeatherServiceUtility {
     static boolean isExists(Map<short[], short[][]> weatherMap, short[] stdTime){
         for(short[] searchKey : weatherMap.keySet()){
-            if(arrEquals(searchKey, stdTime)) return true;
+            if(isStandardData(searchKey, stdTime)) return true;
         }
         return false;
     }
 
     //동등성 비교 for short[]
-    public static boolean arrEquals(short[] a, short[] b) {
-        if (a.length != b.length) {
-            return false;
-        }
+    public static boolean isStandardData(short[] a, short[] b) {
 
         for (int i = 0; i < a.length; i++) {
             if (a[i] != b[i]) {
@@ -24,6 +21,17 @@ public class WeatherServiceUtility {
             }
         }
         //원소의 값이 전부다 같으면 -> 동일하다고 판단
+        return true;
+    }
+
+    //지역 고유번호를 제외하고 시간값이 같다 -> 유효한 데이터라고 판단
+    public static boolean isOutdatedData(short[] a, short[] b) {
+
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
         return true;
     }
 

@@ -1,79 +1,107 @@
 package welldressedmen.narispringboot.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import welldressedmen.narispringboot.config.auth.PrincipalDetails;
-import welldressedmen.narispringboot.domain.Role;
-import welldressedmen.narispringboot.domain.User;
-import welldressedmen.narispringboot.repository.UserRepository;
+import welldressedmen.narispringboot.domain.Region;
+import welldressedmen.narispringboot.dto.*;
+import welldressedmen.narispringboot.service.RecommendService;
+import welldressedmen.narispringboot.service.UserService;
+import welldressedmen.narispringboot.service.WeatherService;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
 
-import static welldressedmen.narispringboot.domain.Role.*;
-
+@Slf4j
 @RestController
-@RequiredArgsConstructor 
+@RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class RestApiController {
-	
-	private final UserRepository userRepository;
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-	// 권환없이 접근가능
-	@GetMapping("home")
-	public String home() {
-		return "<h1>home</h1>";
-	}
+    @Autowired
+    private WeatherService weatherService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RecommendService recommendService;
+    @Value("${app.version}")
+    private String latestVersion;
 
-	// user, manager, admin 접근가능
-	@GetMapping("user")
-	public String user(Authentication authentication) { //JWT사용시, UserDetailsService호출X -> @AuthenticationPrincipal 사용 불가능
-		PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-		System.out.println("id : "+principal.getUser().getUserIdx());
-		System.out.println("username : "+principal.getUser().getUserId());
-		System.out.println("password : "+principal.getUser().getUserPwd());
-		System.out.println("roles : "+principal.getUser().getUserRoles());
-		return "user";
-	}
-	
-	// manager, admin 접근 가능
-	@GetMapping("manager/reports")
-	public String reports() {
-		return "reports";
-	}
-	
-	// admin 접근 가능
-	@GetMapping("admin/users")
-	public List<User> users(){
-		return userRepository.findAll();
-	}
+    @PutMapping("users")
+    public ResponseEntity<ResponseDTO> updateUserInfo(Authentication authentication, @RequestBody UpdateRequestDTO updateRequestDTO) {
 
-	// for 추후 일반 회원가입
-	@PostMapping("join")
-	public String join(@RequestBody User user) {
-		user.setUserPwd(bCryptPasswordEncoder.encode(user.getUserPwd()));
-		Set<Role> roles = new HashSet<>();
-		roles.add(ROLE_USER);
-		user.setUserRoles(roles);
-		userRepository.save(user);
-		return "회원가입완료";
-	}
-	
+        //사용자 정보를 saveRequestDTO에 설정
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        String userId = principal.getUsername(); //PrincipalDetails는 UserDetils를 상속받기때문에 userId정보를 getUsername으로 얻어야함
+
+        //userSex, userCold, userHot, userPreferences를 저장
+        userService.updateMemberInfo(updateRequestDTO, userId);
+
+        ResponseDTO responseDTO = buildResponseDTO(null, null, "유저 정보를 성공적으로 저장했습니다");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseDTO);
+    }
+
+    @GetMapping("/version")
+    public ResponseEntity<ResponseDTO> checkVersion(double currentVersion) {
+        ResponseDTO responseDTO;
+        if(Double.parseDouble(latestVersion) == currentVersion){
+            responseDTO = buildResponseDTO(null, null, "최신버전 입니다.");
+        }else{
+            responseDTO = buildResponseDTO(null, null, "지난버전 입니다.");
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseDTO);
+    }
+
+    @GetMapping("weather-clothing-infos")
+    public ResponseEntity<ResponseDTO> getTotalInfo(Authentication authentication, @RequestParam short regionId, @RequestParam short nx, @RequestParam short ny, @RequestParam String midLandCode, @RequestParam String midTempCode, @RequestParam String stationName) throws IOException {
+
+        Region region = buildRegion(regionId, nx, ny, midLandCode, midTempCode, stationName);
+
+        WeatherInfo weatherInfo =  weatherService.getRegionWeather(region);
+
+        MemberInfo memberInfo = getMemberInfo(authentication);
+
+        FashionInfo fashionInfo = recommendService.getFashion(weatherInfo, memberInfo);
+//        FashionInfo fashionInfo = recommendService.getFashionForTesting(weatherInfo, memberInfo);
+
+        ResponseDTO responseDTO = buildResponseDTO(weatherInfo, fashionInfo, "날씨 정보 요청 성공");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseDTO);
+    }
+    private MemberInfo getMemberInfo(Authentication authentication){
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        String userId = principal.getUsername(); //PrincipalDetails는 UserDetils를 상속받기때문에 userId정보를 getUsername으로 얻어야함
+        //userId -> User(사용자정보) -> UserInfo(사용자 정보(추천용))
+        return userService.getUserInfo(userId);
+    }
+    private ResponseDTO buildResponseDTO(WeatherInfo weatherInfo, FashionInfo fashionInfo, String message) {
+        return ResponseDTO.builder()
+                .weatherInfo(weatherInfo)
+                .fashionInfo(fashionInfo)
+                .version(latestVersion)
+                .message(message)
+                .build();
+    }
+    private static Region buildRegion(short regionId, short nx, short ny, String midLandCode, String midTempCode, String stationName) {
+        return Region.builder()
+                .id(regionId)
+                .nx(nx)
+                .ny(ny)
+                .midLandCode(midLandCode)
+                .midTempCode(midTempCode)
+                .stationName(stationName)
+                .build();
+    }
 }
-
-
-
-
-
-
-
-
-
-
-

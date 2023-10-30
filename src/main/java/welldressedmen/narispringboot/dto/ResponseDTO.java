@@ -6,7 +6,8 @@ import lombok.Getter;
 @Builder
 @Getter
 public class ResponseDTO {
-    private WeatherResponse weatherResponse;
+    private WeatherInfo weatherInfo;
+    private FashionInfo fashionInfo;
     private String version;
     private String message;
 }

@@ -3,11 +3,7 @@ package welldressedmen.narispringboot.service.WeatherParser;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import welldressedmen.narispringboot.Exception.TemporalErrorException;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import welldressedmen.narispringboot.exception.TemporalErrorException;
 
 import static welldressedmen.narispringboot.service.WeatherService.*;
 

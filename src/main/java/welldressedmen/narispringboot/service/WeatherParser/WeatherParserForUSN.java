@@ -2,7 +2,7 @@ package welldressedmen.narispringboot.service.WeatherParser;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import welldressedmen.narispringboot.Exception.TemporalErrorException;
+import welldressedmen.narispringboot.exception.TemporalErrorException;
 
 import static welldressedmen.narispringboot.service.WeatherService.weatherUltraShort;
 

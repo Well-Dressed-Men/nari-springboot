@@ -2,31 +2,31 @@ package welldressedmen.narispringboot.config.auth;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import welldressedmen.narispringboot.domain.User;
+import welldressedmen.narispringboot.domain.Member;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class PrincipalDetails implements UserDetails{
 
-	private User user;
+	private Member member;
 
-    public PrincipalDetails(User user){
-        this.user = user;
+    public PrincipalDetails(Member member){
+        this.member = member;
     }
 
-    public User getUser() {
-		return user;
+    public Member getUser() {
+		return member;
 	}
 
     @Override
     public String getPassword() {
-        return user.getUserPwd();
+        return member.getMemberPwd();
     }
 
     @Override
     public String getUsername() {
-        return user.getUserId();
+        return member.getMemberId();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class PrincipalDetails implements UserDetails{
 	@Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        user.getRoleList().forEach(r -> {
+        member.getRoleList().forEach(r -> {
         	authorities.add(()->{ return r;});
         });
         return authorities;
