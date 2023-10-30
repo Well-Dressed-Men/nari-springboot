@@ -1,5 +1,6 @@
 package welldressedmen.narispringboot.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,20 @@ public class RestApiController {
     private UserService userService;
     @Autowired
     private RecommendService recommendService;
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Value("${app.version}")
     private String latestVersion;
 
     @PutMapping("users")
     public ResponseEntity<ResponseDTO> updateUserInfo(Authentication authentication, @RequestBody UpdateRequestDTO updateRequestDTO) {
+        try {
+            String updateRequestJson = objectMapper.writeValueAsString(updateRequestDTO);
+            log.info("RecommendRequest JSON = {}", updateRequestJson);
+        } catch (Exception e) {
+            log.error("Error converting RecommendRequest to JSON", e);
+        }
 
         //사용자 정보를 saveRequestDTO에 설정
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -103,5 +113,14 @@ public class RestApiController {
                 .midTempCode(midTempCode)
                 .stationName(stationName)
                 .build();
+    }
+
+    private void logObject(Object object) {
+        try {
+            String objectJson = objectMapper.writeValueAsString(object);
+            log.info("objectJson JSON = {}", objectJson);
+        } catch (Exception e) {
+            log.error("Error converting objectJson to JSON", e);
+        }
     }
 }

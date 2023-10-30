@@ -1,5 +1,6 @@
 package welldressedmen.narispringboot.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import welldressedmen.narispringboot.repository.MemberRepository;
 public class UserService {
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    ObjectMapper objectMapper;
 
     //memberId를 통해서 사용자 정보(Member객체) 추출
     public MemberInfo getUserInfo(String userId){
@@ -31,6 +34,12 @@ public class UserService {
     }
 
     public void updateMemberInfo(UpdateRequestDTO updateRequestDTO, String memberId){
+        try {
+            String updateRequestJson = objectMapper.writeValueAsString(updateRequestDTO);
+            log.info("UpdateRequestDTO JSON = {}", updateRequestJson);
+        } catch (Exception e) {
+            log.error("Error converting UpdateRequestDTO to JSON", e);
+        }
 
         //예상치 못하게 null을 받는 경우를 대비한 예외처리
         if (updateRequestDTO == null) {
@@ -39,6 +48,7 @@ public class UserService {
 
         //사용자 정보 가져오기
         Member memberToUpdate = memberRepository.findByMemberId(memberId).get();
+        log.info("memberToUpdate = {}", memberToUpdate);
 
         // 사용자 정보 업데이트(추위성향, 더위성향, 체형)
         memberToUpdate.setMemberSex(updateRequestDTO.getMemberSex());
