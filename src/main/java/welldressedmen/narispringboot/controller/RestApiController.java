@@ -35,7 +35,7 @@ public class RestApiController {
     @Value("${app.version}")
     private String latestVersion;
 
-    @PutMapping("users")
+    @PostMapping("users")
     public ResponseEntity<ResponseDTO> updateUserInfo(Authentication authentication, @RequestBody UpdateRequestDTO updateRequestDTO) {
         try {
             String updateRequestJson = objectMapper.writeValueAsString(updateRequestDTO);
