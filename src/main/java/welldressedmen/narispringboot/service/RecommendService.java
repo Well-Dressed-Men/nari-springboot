@@ -27,7 +27,6 @@ public class RecommendService {
                 .build();
 
         try {
-            // RecommendRequest 객체를 JSON 문자열로 변환하고 로그로 출력합니다.
             String recommendRequestJson = objectMapper.writeValueAsString(recommendRequest);
             log.info("RecommendRequest JSON = {}", recommendRequestJson);
         } catch (Exception e) {
