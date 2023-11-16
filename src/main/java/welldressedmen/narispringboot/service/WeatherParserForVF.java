@@ -1,8 +1,9 @@
-package welldressedmen.narispringboot.service.WeatherParser;
+package welldressedmen.narispringboot.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 import welldressedmen.narispringboot.exception.TemporalErrorException;
 
 
@@ -13,11 +14,12 @@ import java.time.format.DateTimeFormatter;
 import static welldressedmen.narispringboot.service.WeatherService.*;
 
 @Slf4j
+@Component
 public class WeatherParserForVF {
-    public static void parseWeatherDataForVF(String resData, short regionId) {
+    public void parse(String resData, short regionId) {
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
-//        System.out.println("response : "+response);
+
         JSONObject header = response.getJSONObject("header");
         String resultCode = header.getString("resultCode");
         String resultMsg = header.getString("resultMsg");

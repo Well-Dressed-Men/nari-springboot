@@ -1,16 +1,15 @@
 package welldressedmen.narispringboot.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import welldressedmen.narispringboot.domain.Region;
 import welldressedmen.narispringboot.domain.Weather;
 import welldressedmen.narispringboot.dto.WeatherInfo;
-import welldressedmen.narispringboot.service.WeatherParser.*;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +20,7 @@ import static welldressedmen.narispringboot.service.WeatherServiceUtility.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WeatherService {
     public static Map<short[], short[][]> weatherUltraShort = new ConcurrentHashMap<>(); // key : 지역고유번호, 발표날짜, 발표시각
                                                                                          // value : 예보날짜, 예보시간, 기온, 강수량, 풍속, 습도, 강수형태+하늘, 강수확률
@@ -32,6 +32,13 @@ public class WeatherService {
                                                                                        // value : 예보날짜,      최저기온, 최고온도
     public static Map<short[], short[][]> weatherAP = new ConcurrentHashMap<>(); // key : 지역고유번호, 발표날짜, 발표시각
                                                                                  // value : 예보날짜, 예보시각, 미세먼지농도, 초미세먼지농도
+    private final WeatherParserForAP parserForAP;
+
+    private final WeatherParserForUSN parserForUSN;
+    private final WeatherParserForUSF parserForUSF;
+    private final WeatherParserForVF parserForVF;
+    private final WeatherParserForMFL parserForMFL;
+    private final WeatherParserForMFT parserForMFT;
 
     @Value("${weatherApi.serviceKey}")
     private String serviceKey;
@@ -56,7 +63,7 @@ public class WeatherService {
                 .build();
     }
 
-    static void getUSN(Region region, String serviceKey) throws IOException {
+    private void getUSN(Region region, String serviceKey) throws IOException {
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "USN")) return;
         //2.요청 url설정
@@ -64,10 +71,10 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        WeatherParserForUSN.parseWeatherDataForUSN(resData, region.getId());
+        parserForUSN.parse(resData, region.getId());
     };
 
-    static void getUSF(Region region, String serviceKey) throws IOException{
+    private void getUSF(Region region, String serviceKey) throws IOException{
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "USF")) return;
         //2.요청 url설정
@@ -75,11 +82,11 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        WeatherParserForUSF.parseWeatherDataForUSF(resData, region.getId());
+        parserForUSF.parse(resData, region.getId());
     };
 
 
-    static void getVF(Region region, String serviceKey) throws IOException{
+    private void getVF(Region region, String serviceKey) throws IOException{
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "VF")) return;
         //2.요청 url설정
@@ -87,10 +94,10 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        WeatherParserForVF.parseWeatherDataForVF(resData, region.getId());
+        parserForVF.parse(resData, region.getId());
     };
 
-    static void getMFLand(Region region, String serviceKey) throws IOException{
+    private void getMFLand(Region region, String serviceKey) throws IOException{
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "MFL")) return;
         //2.요청 url설정
@@ -98,10 +105,10 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        WeatherParserForMFL.parseWeatherDataForMFL(resData, region.getId());
+        parserForMFL.parse(resData, region.getId());
     };
 
-    static void getMFTemp(Region region, String serviceKey) throws IOException{
+    private void getMFTemp(Region region, String serviceKey) throws IOException{
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "MFT")) return;
         //2.요청 url설정
@@ -109,7 +116,7 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        WeatherParserForMFT.parseWeatherDataForMFT(resData, region.getId());
+        parserForMFT.parse(resData, region.getId());
     };
     static boolean haveAlready(short regionId, String type){
         //기준시각 설정
@@ -150,7 +157,7 @@ public class WeatherService {
     };
 
     //대기오염 정보 조회(Air Pollution)
-    static void getAP(Region region, String serviceKey) throws IOException {
+    private void getAP(Region region, String serviceKey) throws IOException {
         //1.데이터 보유 확인
         if(haveAlready(region.getId(), "AP")) return;
         //2.요청 url설정
@@ -158,7 +165,7 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        WeatherParserForAP.parseWeatherDataForAP(resData, region.getId());
+        parserForAP.parse(resData, region.getId());
     }
 
 }

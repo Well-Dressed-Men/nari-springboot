@@ -25,14 +25,7 @@ public class JwtCreateController {
 	// 발동상황 : 프론트에서 Oauth2.0 로그인 성공이후 사용자 정보를 SpringAPI로 전달
 	@PostMapping("/oauth/jwt/google")
 	public ResponseEntity<Map<String, String>> jwtCreate(@RequestBody Map<String, Object> data) {
-		System.out.println("[in jwtCreate method] 실행");
-		System.out.println(data); //credential, clientId, select_by
-		/*
-		data - profileObj - provider ex)google
-							providerId ex)35378
-							email ex)heenamgoogleId@gmail.com
-							name ex)강희남
-		 */
+
 		OAuthUserInfo googleUser = new GoogleUser((Map<String, Object>)data.get("profileObj"));
 
 		//해당 사용자의 정보가 DB에 있는지 확인(for 최초로그인 여부 확인)
@@ -57,7 +50,6 @@ public class JwtCreateController {
 	}
 
 	static Member buildUser(OAuthUserInfo googleUser){
-
 		return Member.builder()
 				.memberId(googleUser.getProvider()+"_"+googleUser.getProviderId())
 				.memberPwd(null)

@@ -11,7 +11,7 @@ import welldressedmen.narispringboot.repository.MemberRepository;
 
 @Service
 @Slf4j
-public class UserService {
+public class MemberService {
     @Autowired
     MemberRepository memberRepository;
     @Autowired
@@ -23,7 +23,7 @@ public class UserService {
         return buildMemberInfo(member);
     }
 
-    private static MemberInfo buildMemberInfo(Member member) {
+    private MemberInfo buildMemberInfo(Member member) {
         return MemberInfo.builder()
                 .memberIdx(member.getMemberIdx())
                 .memberSex(member.getMemberSex()) //ex : "남"
@@ -33,22 +33,10 @@ public class UserService {
                 .build();
     }
 
+    //userSex, userCold, userHot, userPreferences를 저장
     public void updateMemberInfo(UpdateRequestDTO updateRequestDTO, String memberId){
-        try {
-            String updateRequestJson = objectMapper.writeValueAsString(updateRequestDTO);
-            log.info("UpdateRequestDTO JSON = {}", updateRequestJson);
-        } catch (Exception e) {
-            log.error("Error converting UpdateRequestDTO to JSON", e);
-        }
-
-        //예상치 못하게 null을 받는 경우를 대비한 예외처리
-        if (updateRequestDTO == null) {
-            throw new IllegalArgumentException("SaveRequestDTO cannot be null");
-        }
-
         //사용자 정보 가져오기
         Member memberToUpdate = memberRepository.findByMemberId(memberId).get();
-        log.info("memberToUpdate = {}", memberToUpdate);
 
         // 사용자 정보 업데이트(추위성향, 더위성향, 체형)
         memberToUpdate.setMemberSex(updateRequestDTO.getMemberSex());
@@ -58,7 +46,6 @@ public class UserService {
         memberToUpdate.setMemberPreferences(updateRequestDTO.getMemberPreferences());
 
         memberRepository.update(memberToUpdate);
-        log.info("memberUpdated = {}", memberToUpdate);
     }
     //Member못찾는 예외처리 X이유 : 인증과정을 완료하여, 시큐리티 세션에 등록된 사용자를 대상하므로, user가 null이 됨으로인한 NullPointerException이 발생할 수 없다.
 

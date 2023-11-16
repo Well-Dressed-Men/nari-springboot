@@ -1,16 +1,18 @@
-package welldressedmen.narispringboot.service.WeatherParser;
+package welldressedmen.narispringboot.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 import welldressedmen.narispringboot.exception.TemporalErrorException;
 
 import static welldressedmen.narispringboot.service.WeatherService.weatherUltraShort;
 
+@Component
 public class WeatherParserForUSF {
-    public static void parseWeatherDataForUSF(String resData, short regionId) {
+    public void parse(String resData, short regionId) {
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
-//        System.out.println("response : "+response);
+
         JSONObject header = response.getJSONObject("header");
         String resultCode = header.getString("resultCode");
 

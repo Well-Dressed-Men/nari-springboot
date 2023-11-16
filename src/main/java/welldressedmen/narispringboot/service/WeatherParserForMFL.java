@@ -1,7 +1,8 @@
-package welldressedmen.narispringboot.service.WeatherParser;
+package welldressedmen.narispringboot.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,57 +10,43 @@ import java.time.format.DateTimeFormatter;
 
 import static welldressedmen.narispringboot.service.WeatherService.weatherMidLand;
 
-
+@Component
 public class WeatherParserForMFL {
     /*
         발표날짜 기준 3~6일후의 오전강수확률, 오후 강수확률 데이터를 추출해서 wheatherMidLand에 저장
         (발표날짜 기준 1~2일후의 오전강수확률, 오후 강수확률 데이터는 단기예보로부터 추출해서 wheatherMidLand에 저장)
     */
-    public static void parseWeatherDataForMFL(String resData, short regionId) { //
-        JSONObject jObject = new JSONObject(resData);
-        JSONObject response = jObject.getJSONObject("response");
-        JSONObject body = response.getJSONObject("body");
-        JSONObject items = body.getJSONObject("items");
-        JSONArray jArray = items.getJSONArray("item");
 
-        short baseDate, baseTime;
-        short fcstDate,           rainAm, rainPm, skyAm, skyPm;
+    public void parse(String resData, short regionId) {
+        JSONObject response = new JSONObject(resData).getJSONObject("response");
+        JSONArray items = response.getJSONObject("body").getJSONObject("items").getJSONArray("item");
+        JSONObject firstItem = items.getJSONObject(0);
 
-        short[] key = new short[3]; //regionId, 발표날짜, 발표시각
-        short[][] value = new short[4][5]; //'예보날짜',       , 오전강수확률, 오후강수확률, 오전하늘상태, 오후하늘상태
+        short[] key = buildKeyForMFL(regionId);
+        short[][] value = buildValueForMFL(firstItem);
 
-        String baseDateTime = getStdTimeStringForMF(); //ex : 202308270600
+        weatherMidLand.put(key, value);
+    }
 
-        //키 설정
-        key[0] = regionId;
-        baseDate = (short) (Long.parseLong(baseDateTime)%100000000/10000); //뒤 5~8번째 숫자 추출 -> 827
-        key[1] = baseDate;
-        baseTime = (short) (Long.parseLong(baseDateTime) % 10000);//뒤 4자리 추출 -> 600
-        key[2] = baseTime;
+    private static short[] buildKeyForMFL(short regionId) {
+        String baseDateTime = getStdTimeStringForMF();
+        short baseDate = (short) (Long.parseLong(baseDateTime.substring(4, 8)));
+        short baseTime = (short) (Long.parseLong(baseDateTime.substring(8, 12)));
 
-        JSONObject obj = jArray.getJSONObject(0);
+        return new short[] {regionId, baseDate, baseTime};
+    }
 
-        //value설정
-        setFcstDateForMF(value); //value배열에 예보날짜 정보 세팅
+    private static short[][] buildValueForMFL(JSONObject firstItem) {
+        short[][] value = setFcstDateForMF(new short[4][5]);
 
         for (int day = 3; day <= 6; day++) {
-            //오전, 오후 강수확률 정보 parsing
-            String keyForRainAm = "rnSt" + day + "Am";
-            String keyForRainPm = "rnSt" + day + "Pm";
-            rainAm = (short) obj.getInt(keyForRainAm);;
-            rainPm=(short) obj.getInt(keyForRainPm);;
-            value[day - 3][1] = rainAm;
-            value[day - 3][2] = rainPm;
-
-            //오전, 오후 하늘상태 정보 parsing
-            String keyForSkyAm = "wf" + day + "Am";
-            String keyForSkyPm = "wf" + day + "Pm";
-            skyAm = changeToWeatherCode(obj.getString(keyForSkyAm));
-            skyPm = changeToWeatherCode(obj.getString(keyForSkyPm));
-            value[day - 3][3] =skyAm;
-            value[day - 3][4] =skyPm;
+            value[day - 3][1] = (short) firstItem.getInt("rnSt" + day + "Am");
+            value[day - 3][2] = (short) firstItem.getInt("rnSt" + day + "Pm");
+            value[day - 3][3] = changeToWeatherCode(firstItem.getString("wf" + day + "Am"));
+            value[day - 3][4] = changeToWeatherCode(firstItem.getString("wf" + day + "Pm"));
         }
-        weatherMidLand.put(key, value);
+
+        return value;
     }
 
     //MF기준 기준시각 문자열 return ex : 202308270600

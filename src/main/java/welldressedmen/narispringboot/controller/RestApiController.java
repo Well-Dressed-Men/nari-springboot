@@ -13,7 +13,7 @@ import welldressedmen.narispringboot.config.auth.PrincipalDetails;
 import welldressedmen.narispringboot.domain.Region;
 import welldressedmen.narispringboot.dto.*;
 import welldressedmen.narispringboot.service.RecommendService;
-import welldressedmen.narispringboot.service.UserService;
+import welldressedmen.narispringboot.service.MemberService;
 import welldressedmen.narispringboot.service.WeatherService;
 
 import java.io.IOException;
@@ -26,52 +26,27 @@ public class RestApiController {
     @Autowired
     private WeatherService weatherService;
     @Autowired
-    private UserService userService;
+    private MemberService memberService;
     @Autowired
     private RecommendService recommendService;
     @Autowired
     private ObjectMapper objectMapper;
-
     @Value("${app.version}")
     private String latestVersion;
 
     @PostMapping("users")
     public ResponseEntity<ResponseDTO> updateUserInfo(Authentication authentication, @RequestBody UpdateRequestDTO updateRequestDTO) {
-        try {
-            String updateRequestJson = objectMapper.writeValueAsString(updateRequestDTO);
-            log.info("RecommendRequest JSON = {}", updateRequestJson);
-        } catch (Exception e) {
-            log.error("Error converting RecommendRequest to JSON", e);
-        }
-
-        //사용자 정보를 saveRequestDTO에 설정
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        String userId = principal.getUsername(); //PrincipalDetails는 UserDetils를 상속받기때문에 userId정보를 getUsername으로 얻어야함
-        log.info("principal = {}", principal);
-        log.info("principal = {}", userId);
-
-        //userSex, userCold, userHot, userPreferences를 저장
-        userService.updateMemberInfo(updateRequestDTO, userId);
-
+        String userId = getAuthenticatedUserId(authentication);
+        memberService.updateMemberInfo(updateRequestDTO, userId);
         ResponseDTO responseDTO = buildResponseDTO(null, null, "유저 정보를 성공적으로 저장했습니다");
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
     @GetMapping("/version")
     public ResponseEntity<ResponseDTO> checkVersion(double currentVersion) {
-        ResponseDTO responseDTO;
-        if(Double.parseDouble(latestVersion) == currentVersion){
-            responseDTO = buildResponseDTO(null, null, "최신버전 입니다.");
-        }else{
-            responseDTO = buildResponseDTO(null, null, "지난버전 입니다.");
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseDTO);
+        String message = isLatestVersion(currentVersion) ? "최신버전 입니다." : "지난버전 입니다.";
+        ResponseDTO responseDTO = buildResponseDTO(null, null, message);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
     @GetMapping("weather-clothing-infos")
@@ -84,19 +59,24 @@ public class RestApiController {
         MemberInfo memberInfo = getMemberInfo(authentication);
 
         FashionInfo fashionInfo = recommendService.getFashion(weatherInfo, memberInfo);
-//        FashionInfo fashionInfo = recommendService.getFashionForTesting(weatherInfo, memberInfo);
 
         ResponseDTO responseDTO = buildResponseDTO(weatherInfo, fashionInfo, "날씨 정보 요청 성공");
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
+
+    private String getAuthenticatedUserId(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return principal.getUsername(); //PrincipalDetails는 UserDetils를 상속받기때문에 userId정보를 getUsername으로 얻어야함
     }
     private MemberInfo getMemberInfo(Authentication authentication){
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         String userId = principal.getUsername(); //PrincipalDetails는 UserDetils를 상속받기때문에 userId정보를 getUsername으로 얻어야함
-        //userId -> User(사용자정보) -> UserInfo(사용자 정보(추천용))
-        return userService.getUserInfo(userId);
+        return memberService.getUserInfo(userId); //userId -> User(사용자정보) -> UserInfo(사용자 정보(패션추천에 필요한))
+    }
+
+    private boolean isLatestVersion(double currentVersion){
+        return currentVersion == Double.parseDouble(latestVersion);
     }
     private ResponseDTO buildResponseDTO(WeatherInfo weatherInfo, FashionInfo fashionInfo, String message) {
         return ResponseDTO.builder()
@@ -117,12 +97,4 @@ public class RestApiController {
                 .build();
     }
 
-    private void logObject(Object object) {
-        try {
-            String objectJson = objectMapper.writeValueAsString(object);
-            log.info("objectJson JSON = {}", objectJson);
-        } catch (Exception e) {
-            log.error("Error converting objectJson to JSON", e);
-        }
-    }
 }

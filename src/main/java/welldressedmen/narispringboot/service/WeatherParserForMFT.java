@@ -1,7 +1,8 @@
-package welldressedmen.narispringboot.service.WeatherParser;
+package welldressedmen.narispringboot.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,51 +10,47 @@ import java.time.format.DateTimeFormatter;
 
 import static welldressedmen.narispringboot.service.WeatherService.weatherMidTemp;
 
-
+@Component
 public class WeatherParserForMFT {
     /*
         발표날짜 기준 3~6일후의 최저기온, 최고기온 데이터를 추출해서 wheatherMidTemp에 저장
         (발표날짜 기준 1~2일후의 최저기온, 최고기온 데이터는 단기예보로부터 추출해서 wheatherMidTemp에 저장)
     */
-    public static void parseWeatherDataForMFT(String resData, short regionId) { //
-        JSONObject jObject = new JSONObject(resData);
-        JSONObject response = jObject.getJSONObject("response");
-        JSONObject body = response.getJSONObject("body");
-        JSONObject items = body.getJSONObject("items");
-        JSONArray jArray = items.getJSONArray("item");
+    public void parse(String resData, short regionId) {
+        JSONObject response = new JSONObject(resData).getJSONObject("response");
+        JSONArray items = response.getJSONObject("body").getJSONObject("items").getJSONArray("item");
+        JSONObject firstItem = items.getJSONObject(0);
 
-        short baseDate, baseTime;
-        short fcstDate,           tempLowest, tempHighest;
+        short[] key = buildKeyForMFT(regionId);
+        short[][] value = buildValueForMFT(firstItem);
 
-        short[] key = new short[3]; //regionId, 발표날짜, 발표시각
-        short[][] value = new short[4][3]; //'예보날짜',       ,최저기온, 최고기온
-
-        String baseDateTime = getStdTimeStringForMF(); //ex : 202308270600
-
-        //키 설정
-        key[0] = regionId;
-        baseDate = (short) (Long.parseLong(baseDateTime)%100000000/10000); //뒤 5~8번째 숫자 추출 -> 827
-        key[1] = baseDate;
-        baseTime = (short) (Long.parseLong(baseDateTime) % 10000);//뒤 4자리 추출 -> 600
-        key[2] = baseTime;
-
-        JSONObject obj = jArray.getJSONObject(0);
-        System.out.println("obj: " + obj);
-
-        //value설정
-        setFcstDateForMF(value); //value배열에 예보날짜 정보 세팅
-
-        for (int day = 3; day <= 6; day++) {
-            //오전, 오후 강수확률 정보 parsing
-            String keyForTempLowest = "taMin" + day;
-            String keyForTempHighest = "taMax" + day;
-            tempLowest = (short)(obj.getInt(keyForTempLowest)*10);
-            tempHighest =(short)(obj.getInt(keyForTempHighest)*10);
-            value[day - 3][1] = tempLowest;
-            value[day - 3][2] = tempHighest;
-        }
         weatherMidTemp.put(key, value);
     }
+
+    private static short[] buildKeyForMFT(short regionId) {
+        String baseDateTime = getStdTimeStringForMF();
+        short baseDate = (short) (Long.parseLong(baseDateTime.substring(4, 8)));
+        short baseTime = (short) (Long.parseLong(baseDateTime.substring(8, 12)));
+
+        return new short[] {regionId, baseDate, baseTime};
+    }
+
+    private static short[][] buildValueForMFT(JSONObject firstItem) {
+        short[][] value = setFcstDateForMF(new short[4][3]);
+
+        for (int day = 3; day <= 6; day++) {
+            value[day - 3][1] = parseTemperature(firstItem, "taMin" + day);
+            value[day - 3][2] = parseTemperature(firstItem, "taMax" + day);
+        }
+
+        return value;
+    }
+
+    private static short parseTemperature(JSONObject item, String key) {
+        return (short) (item.getInt(key) * 10);
+    }
+
+
 
     //MF기준 기준시각 문자열 return ex : 202308270600
     static String getStdTimeStringForMF(){
@@ -100,4 +97,5 @@ public class WeatherParserForMFT {
         }
         return stdTime.toLocalDate();
     }
+
 }
