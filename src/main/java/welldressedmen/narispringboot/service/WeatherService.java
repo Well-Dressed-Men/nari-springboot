@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import welldressedmen.narispringboot.domain.Region;
 import welldressedmen.narispringboot.domain.Weather;
 import welldressedmen.narispringboot.dto.WeatherInfo;
+import welldressedmen.narispringboot.exception.TemporalErrorException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -94,7 +95,20 @@ public class WeatherService {
         //3.요청
         String resData = requestWeather(url);
         //4.날씨저장
-        parserForVF.parse(resData, region.getId());
+        try {
+            parserForVF.parse(resData, region.getId());
+            return; // 성공 시 종료
+        } catch (TemporalErrorException e) {
+            log.warn("VF 1차 요청 실패. 이전 기준 시간대 retry : regionId={}", region.getId());
+        }
+        //상황:기상청API 일시적 오류 발생
+        String[] retryBase = WeatherRequest.getStdTimeStringForVFRetry();
+        //2.재시도 요청 url설정
+        URL retryUrl = setURL(serviceKey, region, "VF", retryBase[0], retryBase[1]);
+        //3.요청
+        String retryRes = requestWeather(retryUrl);
+        //4.날씨저장
+        parserForVF.parse(retryRes, region.getId());
     };
 
     private void getMFLand(Region region, String serviceKey) throws IOException{

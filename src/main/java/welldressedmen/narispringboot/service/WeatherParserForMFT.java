@@ -13,8 +13,8 @@ import static welldressedmen.narispringboot.service.WeatherService.weatherMidTem
 @Component
 public class WeatherParserForMFT {
     /*
-        발표날짜 기준 3~6일후의 최저기온, 최고기온 데이터를 추출해서 wheatherMidTemp에 저장
-        (발표날짜 기준 1~2일후의 최저기온, 최고기온 데이터는 단기예보로부터 추출해서 wheatherMidTemp에 저장)
+        발표날짜 기준 5~6일후의 최저기온, 최고기온 데이터를 추출해서 wheatherMidTemp에 저장
+        (발표날짜 기준 1~4일후의 최저기온, 최고기온 데이터는 단기예보로부터 추출해서 wheatherMidTemp에 저장)
     */
     public void parse(String resData, short regionId) {
         JSONObject response = new JSONObject(resData).getJSONObject("response");
@@ -36,21 +36,21 @@ public class WeatherParserForMFT {
     }
 
     private static short[][] buildValueForMFT(JSONObject firstItem) {
-        short[][] value = setFcstDateForMF(new short[4][3]);
+        short[][] value = setFcstDateForMF(new short[2][3]);
 
-        for (int day = 3; day <= 6; day++) {
-            value[day - 3][1] = parseTemperature(firstItem, "taMin" + day);
-            value[day - 3][2] = parseTemperature(firstItem, "taMax" + day);
+        for (int day = 5; day <= 6; day++) {
+            int idx = day - 5; // 5일→0, 6일→1
+            value[idx][1] = parseTemperature(firstItem, "taMin" + day);
+            value[idx][2] = parseTemperature(firstItem, "taMax" + day);
         }
 
         return value;
     }
 
+
     private static short parseTemperature(JSONObject item, String key) {
         return (short) (item.getInt(key) * 10);
     }
-
-
 
     //MF기준 기준시각 문자열 return ex : 202308270600
     static String getStdTimeStringForMF(){
@@ -78,13 +78,14 @@ public class WeatherParserForMFT {
     static short[][] setFcstDateForMF(short[][] value){
         LocalDate stdTime = getStdTimeForMF();
 
-        for(int day=3;day<=6;day++){
-            stdTime.plusDays(day); //day일 후의 날짜 계산 for(0731->0803, 1231->0103)
-            short dayAfterN = Short.parseShort(stdTime.format(DateTimeFormatter.ofPattern("MMdd"))); //월일 정보만 추출
-            value[day-3][0] = dayAfterN;
+        for(int day = 5; day <= 6; day++){
+            LocalDate target = stdTime.plusDays(day); // 기준일로부터 day일 후
+            short dayAfterN = Short.parseShort(target.format(DateTimeFormatter.ofPattern("MMdd")));
+            value[day - 5][0] = dayAfterN; // 5일→0, 6일→1
         }
         return value;
     };
+
 
     static LocalDate getStdTimeForMF(){
         LocalDateTime stdTime = LocalDateTime.now();

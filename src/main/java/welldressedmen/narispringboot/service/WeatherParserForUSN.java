@@ -11,7 +11,7 @@ import static welldressedmen.narispringboot.service.WeatherService.weatherUltraS
 
 @Slf4j
 @Component
-public class WeatherParserForUSN {
+public class WeatherParserForUSN implements WeatherParser{
     public void parse(String resData, short regionId) {
         JSONObject response = extractResponse(new JSONObject(resData));
         validateResponse(response);

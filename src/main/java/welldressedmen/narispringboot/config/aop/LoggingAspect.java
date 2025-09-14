@@ -19,9 +19,9 @@ public class LoggingAspect {
     @Around(
             "execution(* welldressedmen.narispringboot.service.WeatherParserForUSN.parse(..))"+
             " || execution(* welldressedmen.narispringboot.service.WeatherParserForUSF.parse(..))"+
-//            " || execution(* welldressedmen.narispringboot.service.WeatherParserForVF.parse(..))"+
-//            " || execution(* welldressedmen.narispringboot.service.WeatherParserForMFL.parse(..))"+
-//            " || execution(* welldressedmen.narispringboot.service.WeatherParserForMFT.parse(..))"+
+            " || execution(* welldressedmen.narispringboot.service.WeatherParserForVF.parse(..))"+
+            " || execution(* welldressedmen.narispringboot.service.WeatherParserForMFL.parse(..))"+
+            " || execution(* welldressedmen.narispringboot.service.WeatherParserForMFT.parse(..))"+
             " || execution(* welldressedmen.narispringboot.service.WeatherParserForAP.parse(..))"
     )
     public Object logParamString(ProceedingJoinPoint joinPoint) throws Throwable {

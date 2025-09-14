@@ -82,13 +82,13 @@ public class WeatherResponseSet {
 
         short[] searchKeyForVF = getStdTimeKeyForVF(regionId);
 
-        // 2개의 중기날씨정보 생성(육상 관련)(from 단기예보조회)
+        // 4개의 중기날씨정보 생성(육상 관련)(from 단기예보조회)
         Iterator<short[]> midLandKeyIteratorForVF = weatherMidLand.keySet().iterator();
         while (midLandKeyIteratorForVF.hasNext()) {
             short[] key = midLandKeyIteratorForVF.next();
             if (isStandardData(searchKeyForVF, key)) {
                 short[][] values = weatherMidLand.get(key);
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 4; i++) {
                     short[] value = values[i];
                     Weather.Mid item = buildMidWeatherItem(value);
                     result.add(item);
@@ -98,13 +98,13 @@ public class WeatherResponseSet {
             }
         }
 
-        // 2개의 중기날씨정보 완성(기온 관련)(from 단기예보조회)
+        // 4개의 중기날씨정보 완성(기온 관련)(from 단기예보조회)
         Iterator<short[]> midTempKeyIteratorForVF = weatherMidTemp.keySet().iterator();
         while (midTempKeyIteratorForVF.hasNext()) {
             short[] key = midTempKeyIteratorForVF.next();
             if (isStandardData(searchKeyForVF, key)) {
                 short[][] values = weatherMidTemp.get(key);
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 4; i++) {
                     short[] value = values[i];
                     result.get(i).setTempLowest(value[1]);
                     result.get(i).setTempHighest(value[2]);
@@ -116,13 +116,13 @@ public class WeatherResponseSet {
 
         short[] searchKeyForMF = getStdTimeKeyForMF(regionId);
 
-        // 2개의 중기날씨정보 생성(육상 관련)(from 중기육상조회)
+        // 2개의 중기날씨정보 생성(강수 관련)(from 중기육상조회)
         Iterator<short[]> midLandKeyIteratorForMF = weatherMidLand.keySet().iterator();
         while (midLandKeyIteratorForMF.hasNext()) {
             short[] key = midLandKeyIteratorForMF.next();
             if (isStandardData(searchKeyForMF, key)) {
                 short[][] values = weatherMidLand.get(key);
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < 2; i++) {
                     short[] value = values[i];
                     Weather.Mid item = buildMidWeatherItem(value);
                     result.add(item);
@@ -138,7 +138,7 @@ public class WeatherResponseSet {
             short[] key = midTempKeyIteratorForMF.next();
             if (isStandardData(searchKeyForMF, key)) {
                 short[][] values = weatherMidTemp.get(key);
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i <2; i++) {
                     short[] value = values[i];
                     result.get(i+2).setTempLowest(value[1]);
                     result.get(i+2).setTempHighest(value[2]);
@@ -239,7 +239,6 @@ public class WeatherResponseSet {
                 .skyPm(value[4])
                 .build();
     }
-
     private static Weather.AP buildAirPollutionItem(short[] value) {
         return Weather.AP.builder()
                 .fcstDate(value[0])
@@ -248,5 +247,4 @@ public class WeatherResponseSet {
                 .pm25Value(value[3])
                 .build();
     }
-
 }

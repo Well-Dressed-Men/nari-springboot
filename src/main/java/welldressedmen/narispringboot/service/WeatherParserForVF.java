@@ -15,7 +15,7 @@ import static welldressedmen.narispringboot.service.WeatherService.*;
 
 @Slf4j
 @Component
-public class WeatherParserForVF {
+public class WeatherParserForVF implements WeatherParser{
     public void parse(String resData, short regionId) {
         JSONObject jObject = new JSONObject(resData);
         JSONObject response = jObject.getJSONObject("response");
@@ -45,10 +45,10 @@ public class WeatherParserForVF {
         short[][] valueForWS = new short[25][8]; //'예보날짜', '예보시각', '(1시간)기온' '강수량' '풍속' '습도' '강수형태+하늘' 강수확률
 
         short[] keyForWML = new short[3]; //regionId, 발표날짜, 발표시각
-        short[][] valueForWML = new short[2][5]; //'예보날짜',         , 오전강수확률, 오후강수확률, 오전하늘상태, 오후하늘상태
+        short[][] valueForWML = new short[4][5]; //'예보날짜',         , 오전강수확률, 오후강수확률, 오전하늘상태, 오후하늘상태
 
         short[] keyForWMT = new short[3]; //regionId, 발표날짜, 발표시각
-        short[][] valueForWMT = new short[2][3]; //'예보날짜',         , 최저기온, 최고기온
+        short[][] valueForWMT = new short[4][3]; //'예보날짜',         , 최저기온, 최고기온
 
         //키 설정
         JSONObject firstObj = jArray.getJSONObject(0);
@@ -70,25 +70,37 @@ public class WeatherParserForVF {
         short change=-1;
         int row=0;
 
-        short rainPercentageAmongAmAfterOneday = Short.MIN_VALUE;;
-        short rainPercentageAmongPmAfterOneday = Short.MIN_VALUE;;
-        short rainPercentageAmongAmAfterTwoday = Short.MIN_VALUE;;
-        short rainPercentageAmongPmAfterTwoday = Short.MIN_VALUE;;
+        short rainPercentageAmongAmAfterOneday = Short.MIN_VALUE;
+        short rainPercentageAmongPmAfterOneday = Short.MIN_VALUE;
+        short rainPercentageAmongAmAfterTwoday = Short.MIN_VALUE;
+        short rainPercentageAmongPmAfterTwoday = Short.MIN_VALUE;
+        short rainPercentageAmongAmAfterThreeday = Short.MIN_VALUE;
+        short rainPercentageAmongPmAfterThreeday = Short.MIN_VALUE;
+        short rainPercentageAmongAmAfterFourday = Short.MIN_VALUE;
+        short rainPercentageAmongPmAfterFourday = Short.MIN_VALUE;
 
         short tempLowestAfterOneday = Short.MAX_VALUE;
         short tempHighestAfterOneday = Short.MIN_VALUE;
-        short tempLowestAfterTwoday = Short.MAX_VALUE;;
+        short tempLowestAfterTwoday = Short.MAX_VALUE;
         short tempHighestAfterTwoday = Short.MIN_VALUE;
+        short tempLowestAfterThreeday = Short.MAX_VALUE;
+        short tempHighestAfterThreeday = Short.MIN_VALUE;
+        short tempLowestAfterFourday  = Short.MAX_VALUE;
+        short tempHighestAfterFourday = Short.MIN_VALUE;
+
 
         short[][] skyRainTypeCountAmAfterOneday = new short[2][8]; //[0] -> skyCount, [1]->rainType Count
         short[][] skyRainTypeCountPmAfterOneday = new short[2][8];
         short[][] skyRainTypeCountAmAfterTwoday = new short[2][8];
         short[][] skyRainTypeCountPmAfterTwoday = new short[2][8];
+        short[][] skyRainTypeCountAmAfterThreeday = new short[2][8];
+        short[][] skyRainTypeCountPmAfterThreeday = new short[2][8];
+        short[][] skyRainTypeCountAmAfterFourday  = new short[2][8];
+        short[][] skyRainTypeCountPmAfterFourday  = new short[2][8];
 
         for (int jsonIndex = 0; jsonIndex < jArray.length(); jsonIndex++) {
 
             JSONObject obj = jArray.getJSONObject(jsonIndex);
-//            System.out.println("obj: " + obj);
 
             if(jsonIndex%12==0){ //특정 시각에 관한 예측값을 모두 저장했을때, 다음 시각정보를 저장
                 fcstDate = (short) (obj.getInt("fcstDate") % 10000);
@@ -105,22 +117,31 @@ public class WeatherParserForVF {
                 }
             }
 
-            if(change==3){ //현재날짜+3일후의 데이터는 집계하지 않음(MFL, MFT로부터 간편하게 얻음)
+            if(change==5){ //현재날짜+5일후의 데이터는 집계하지 않음(MFL, MFT로부터 간편하게 얻음)
                 short skyRainTypeAmAfterOneday = getMostFrom(skyRainTypeCountAmAfterOneday); //1일후 오전 하늘상태+강수형태에서 max찾기
-                short skyRainTypePmAfterOneday = getMostFrom(skyRainTypeCountPmAfterOneday); //1일후 오전 하늘상태+강수형태에서 max찾기
-                short skyRainTypeAmAfterTwoday = getMostFrom(skyRainTypeCountAmAfterTwoday); //2일후 오후 하늘상태+강수형태에서 max찾기
+                short skyRainTypePmAfterOneday = getMostFrom(skyRainTypeCountPmAfterOneday); //1일후 오후 하늘상태+강수형태에서 max찾기
+                short skyRainTypeAmAfterTwoday = getMostFrom(skyRainTypeCountAmAfterTwoday); //2일후 오전 하늘상태+강수형태에서 max찾기
                 short skyRainTypePmAfterTwoday = getMostFrom(skyRainTypeCountPmAfterTwoday); //2일후 오후 하늘상태+강수형태에서 max찾기
+                short skyRainTypeAmAfterThreeday = getMostFrom(skyRainTypeCountAmAfterThreeday); //3일후 오전 하늘상태+강수형태에서 max찾기
+                short skyRainTypePmAfterThreeday = getMostFrom(skyRainTypeCountPmAfterThreeday); //3일후 오후 하늘상태+강수형태에서 max찾기
+                short skyRainTypeAmAfterFourday = getMostFrom(skyRainTypeCountAmAfterFourday); //4일후 오전 하늘상태+강수형태에서 max찾기
+                short skyRainTypePmAfterFourday = getMostFrom(skyRainTypeCountPmAfterFourday); //4일후 오후 하늘상태+강수형태에서 max찾기
 
                 //WML에 put할 임시배열 값 세팅
                 valueForWML = setFcstDateForVF(valueForWML); //날짜값 세팅
-                valueForWML = setRainAmAndPmForVF(valueForWML, rainPercentageAmongAmAfterOneday, rainPercentageAmongPmAfterOneday, rainPercentageAmongAmAfterTwoday, rainPercentageAmongPmAfterTwoday);
-                valueForWML = setSkyAmAndPmForVF(valueForWML, skyRainTypeAmAfterOneday, skyRainTypePmAfterOneday, skyRainTypeAmAfterTwoday, skyRainTypePmAfterTwoday);
+                valueForWML = setRainAmAndPmForVF(valueForWML, rainPercentageAmongAmAfterOneday, rainPercentageAmongPmAfterOneday, rainPercentageAmongAmAfterTwoday, rainPercentageAmongPmAfterTwoday, rainPercentageAmongAmAfterThreeday, rainPercentageAmongPmAfterThreeday, rainPercentageAmongAmAfterFourday, rainPercentageAmongPmAfterFourday);
+                valueForWML = setSkyAmAndPmForVF(valueForWML, skyRainTypeAmAfterOneday, skyRainTypePmAfterOneday, skyRainTypeAmAfterTwoday, skyRainTypePmAfterTwoday, skyRainTypeAmAfterThreeday, skyRainTypePmAfterThreeday, skyRainTypeAmAfterFourday, skyRainTypePmAfterFourday);
 
                 //WMT에 추가할 임시배열 값 세팅
                 valueForWMT = setFcstDateForVF(valueForWMT);
-                valueForWMT = setTempLowestAndHighestForVF(valueForWMT, tempLowestAfterOneday, tempHighestAfterOneday, tempLowestAfterTwoday, tempHighestAfterTwoday);
-
-                //WML, WMT에 추가할 1~2일후의 오전오후 강수확률, 오전오후하늘상태, 최저최고기온 정보배열을 setting한후 파싱for문 종료
+                valueForWMT = setTempLowestAndHighestForVF(
+                        valueForWMT,
+                        tempLowestAfterOneday,  tempHighestAfterOneday,
+                        tempLowestAfterTwoday,  tempHighestAfterTwoday,
+                        tempLowestAfterThreeday,tempHighestAfterThreeday,
+                        tempLowestAfterFourday, tempHighestAfterFourday
+                );
+                //WML, WMT에 추가할 1~4일후의 오전오후 강수확률, 오전오후하늘상태, 최저최고기온 정보배열을 setting한후 파싱for문 종료
                 //break이후 맨아래줄로 이동해서 WS, WML, WMT맵에 키-값쌍을 put
                 break;
             }
@@ -144,6 +165,12 @@ public class WeatherParserForVF {
                         }else if(change==2){ //이틀뒤 최저최고기온 갱신
                             if(tempLowestAfterTwoday > temp) tempLowestAfterTwoday = temp;
                             if(tempHighestAfterTwoday < temp) tempHighestAfterTwoday = temp;
+                        }else if(change==3){ //삼일뒤 최저최고기온 갱신
+                            if(tempLowestAfterThreeday > temp) tempLowestAfterThreeday = temp;
+                            if(tempHighestAfterThreeday < temp) tempHighestAfterThreeday = temp;
+                        }else if(change==4){ //사일뒤 최저최고기온 갱신
+                            if(tempLowestAfterFourday > temp) tempLowestAfterFourday = temp;
+                            if(tempHighestAfterFourday < temp) tempHighestAfterFourday = temp;
                         }
                         break;
                     case "PCP": //강수량
@@ -189,6 +216,18 @@ public class WeatherParserForVF {
                             }else{
                                 skyRainTypeCountPmAfterTwoday[0][sky]++;
                             }
+                        }else if(change==3){
+                            if(fcstTime < 1200){
+                                skyRainTypeCountAmAfterThreeday[0][sky]++;
+                            }else{
+                                skyRainTypeCountPmAfterThreeday[0][sky]++;
+                            }
+                        }else if(change==4){
+                            if(fcstTime < 1200){
+                                skyRainTypeCountAmAfterFourday[0][sky]++;
+                            }else{
+                                skyRainTypeCountPmAfterFourday[0][sky]++;
+                            }
                         }
                         if(row<25) {
                             valueForWS[row][6] += sky * 10;
@@ -207,6 +246,18 @@ public class WeatherParserForVF {
                                 skyRainTypeCountAmAfterTwoday[1][rainType]++;
                             }else{
                                 skyRainTypeCountPmAfterTwoday[1][rainType]++;
+                            }
+                        }else if(change==3){
+                            if(fcstTime < 1200){
+                                skyRainTypeCountAmAfterThreeday[1][rainType]++;
+                            }else{
+                                skyRainTypeCountPmAfterThreeday[1][rainType]++;
+                            }
+                        }else if(change==4){
+                            if(fcstTime < 1200){
+                                skyRainTypeCountAmAfterFourday[1][rainType]++;
+                            }else{
+                                skyRainTypeCountPmAfterFourday[1][rainType]++;
                             }
                         }
                         if(row<25) {
@@ -229,7 +280,18 @@ public class WeatherParserForVF {
                             if(rainPercentageAmongAmAfterTwoday < rainPercentage) rainPercentageAmongAmAfterTwoday = rainPercentage;
                             //오후
                             if(rainPercentageAmongPmAfterTwoday < rainPercentage) rainPercentageAmongPmAfterTwoday = rainPercentage;
+                        }else if(change==3){ // 삼일뒤 오전오후 강수확률 갱신
+                            if(fcstTime < 1200 && rainPercentageAmongAmAfterThreeday < rainPercentage)
+                                rainPercentageAmongAmAfterThreeday = rainPercentage;
+                            if(fcstTime >= 1200 && rainPercentageAmongPmAfterThreeday < rainPercentage)
+                                rainPercentageAmongPmAfterThreeday = rainPercentage;
+                        }else if(change==4){ // 사일뒤 오전오후 강수확률 갱신
+                            if(fcstTime < 1200 && rainPercentageAmongAmAfterFourday < rainPercentage)
+                                rainPercentageAmongAmAfterFourday = rainPercentage;
+                            if(fcstTime >= 1200 && rainPercentageAmongPmAfterFourday < rainPercentage)
+                                rainPercentageAmongPmAfterFourday = rainPercentage;
                         }
+
                 }
             }
             if(jsonIndex%12==11) row++; //0~11 반복한뒤 다음줄 채우기
@@ -270,8 +332,8 @@ public class WeatherParserForVF {
     static short[][] setFcstDateForVF(short[][] valueForWML){
         LocalDate stdTime = getStdTimeForVF();
 
-        for(int day=1;day<=2;day++){
-            stdTime.plusDays(day); //day일 후의 날짜 계산 for(0731->0801, 1231->0101)
+        for(int day=1;day<=4;day++){
+            stdTime = stdTime.plusDays(1); //day일 후의 날짜 계산 for(0731->0801, 1231->0101)
             short dayAfterN = Short.parseShort(stdTime.format(DateTimeFormatter.ofPattern("MMdd"))); //월일 정보만 추출
             valueForWML[day-1][0] = dayAfterN;
         }
@@ -292,27 +354,53 @@ public class WeatherParserForVF {
         return stdTime.toLocalDate();
     }
 
-    static short[][] setRainAmAndPmForVF(short[][] valueForWML, short rainAmAfterOneday, short rainPmAfterOneday, short rainAmAfterTwoday, short rainPmAfterTwoday){
+    //WML(중기날씨)에 강수확률값 세팅(by 가장 높은 강수확률 선택)
+    static short[][] setRainAmAndPmForVF(short[][] valueForWML, short rainAmAfterOneday, short rainPmAfterOneday, short rainAmAfterTwoday, short rainPmAfterTwoday, short rainAmAfterThreeday, short rainPmAfterThreeday, short rainAmAfterFourday, short rainPmAfterFourday){
         valueForWML[0][1] = rainAmAfterOneday;
         valueForWML[0][2] = rainPmAfterOneday;
         valueForWML[1][1] = rainAmAfterTwoday;
         valueForWML[1][2] = rainPmAfterTwoday;
+        valueForWML[2][1] = rainAmAfterThreeday;
+        valueForWML[2][2] = rainPmAfterThreeday;
+        valueForWML[3][1] = rainAmAfterFourday;
+        valueForWML[3][2] = rainPmAfterFourday;
         return valueForWML;
     };
 
-    static short[][] setSkyAmAndPmForVF(short[][] valueForWML, short skyRainTypeAmAfterOneday, short skyRainTypePmAfterOneday, short skyRainTypeAmAfterTwoday, short skyRainTypePmAfterTwoday){
+    //WML(중기날씨)에 날씨종류값 세팅
+    static short[][] setSkyAmAndPmForVF(short[][] valueForWML, short skyRainTypeAmAfterOneday, short skyRainTypePmAfterOneday, short skyRainTypeAmAfterTwoday, short skyRainTypePmAfterTwoday, short skyRainTypeAmAfterThreeday, short skyRainTypePmAfterThreeday, short skyRainTypeAmAfterFourday, short skyRainTypePmAfterFourday){
         valueForWML[0][3] = skyRainTypeAmAfterOneday;
         valueForWML[0][4] = skyRainTypePmAfterOneday;
         valueForWML[1][3] = skyRainTypeAmAfterTwoday;
         valueForWML[1][4] = skyRainTypePmAfterTwoday;
+        valueForWML[2][3] = skyRainTypeAmAfterThreeday;
+        valueForWML[2][4] = skyRainTypePmAfterThreeday;
+        valueForWML[3][3] = skyRainTypeAmAfterFourday;
+        valueForWML[3][4] = skyRainTypePmAfterFourday;
         return valueForWML;
     };
 
-    static short[][] setTempLowestAndHighestForVF(short[][] valueForWMT, short tempLowestAfterOneday, short tempHighestAfterOneday, short tempLowestAfterTwoday, short tempHighestAfterTwoday){
+    //WML(중기날씨)에 최고최저 온도값 세팅
+    static short[][] setTempLowestAndHighestForVF(
+            short[][] valueForWMT,
+            short tempLowestAfterOneday,   short tempHighestAfterOneday,
+            short tempLowestAfterTwoday,   short tempHighestAfterTwoday,
+            short tempLowestAfterThreeday, short tempHighestAfterThreeday,
+            short tempLowestAfterFourday,  short tempHighestAfterFourday
+    ){
         valueForWMT[0][1] = tempLowestAfterOneday;
         valueForWMT[0][2] = tempHighestAfterOneday;
+
         valueForWMT[1][1] = tempLowestAfterTwoday;
         valueForWMT[1][2] = tempHighestAfterTwoday;
+
+        valueForWMT[2][1] = tempLowestAfterThreeday;
+        valueForWMT[2][2] = tempHighestAfterThreeday;
+
+        valueForWMT[3][1] = tempLowestAfterFourday;
+        valueForWMT[3][2] = tempHighestAfterFourday;
+
         return valueForWMT;
-    };
+    }
+
 }

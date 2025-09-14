@@ -90,6 +90,34 @@ public class WeatherRequest {
         URL url = new URL(urlBuilder.toString());
         return url;
     };
+    // 기준시각을 직접 지정해서 VF URL 생성 (USN/USF도 원하면 동일 패턴으로 확장 가능)
+    static URL setURL(String serviceKey, Region region, String type, String baseDate, String baseTime)
+            throws UnsupportedEncodingException, MalformedURLException {
+
+        if (!"VF".equals(type)) {
+            // 필요 시 USN/USF도 확장. 지금은 VF만 받도록 방어.
+            return setURL(serviceKey, region, type); // 기존 로직으로 fallback
+        }
+
+        int nx = region.getNx();
+        int ny = region.getNy();
+
+        StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1360000/");
+        urlBuilder.append("VilageFcstInfoService_2.0/getVilageFcst");
+
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + serviceKey);
+        urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + URLEncoder.encode("JSON", "UTF-8"));
+
+        urlBuilder.append("&" + URLEncoder.encode("base_date", "UTF-8") + "=" + URLEncoder.encode(baseDate, "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("base_time", "UTF-8") + "=" + URLEncoder.encode(baseTime, "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("nx", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(nx), "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("ny", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(ny), "UTF-8"));
+
+        return new URL(urlBuilder.toString());
+    }
+
 
     //USN기준 기준시각 문자열배열 return
     static String[] getStdTimeStringForUSN(){
@@ -153,6 +181,24 @@ public class WeatherRequest {
         String[] stdTimeString = new String[]{baseDate, baseTime};
         return stdTimeString;
     };
+    // 현재 VF 기준 산출 방식과 동일하게 정렬한 뒤, 정확히 3시간 이전으로 이동
+    static String[] getStdTimeStringForVFRetry() {
+        String[] base = getStdTimeStringForVF();
+        String baseDate = base[0]; // yyyyMMdd
+        String baseTime = base[1]; // HHmm
+
+        LocalDateTime dt = LocalDateTime.parse(
+                baseDate + baseTime,
+                DateTimeFormatter.ofPattern("yyyyMMddHHmm")
+        );
+
+        // 3시간 이전 이동
+        dt = dt.minusHours(3);
+
+        String newDate = dt.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String newTime = dt.format(DateTimeFormatter.ofPattern("HHmm"));
+        return new String[]{ newDate, newTime };
+    }
 
     //MF기준 기준시각 문자열 return ex : 202308270600
     static String getStdTimeStringForMF(){

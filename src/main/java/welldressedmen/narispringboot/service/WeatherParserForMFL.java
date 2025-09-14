@@ -13,8 +13,8 @@ import static welldressedmen.narispringboot.service.WeatherService.weatherMidLan
 @Component
 public class WeatherParserForMFL {
     /*
-        발표날짜 기준 3~6일후의 오전강수확률, 오후 강수확률 데이터를 추출해서 wheatherMidLand에 저장
-        (발표날짜 기준 1~2일후의 오전강수확률, 오후 강수확률 데이터는 단기예보로부터 추출해서 wheatherMidLand에 저장)
+        발표날짜 기준 5~6일후의 오전강수확률, 오후 강수확률 데이터를 추출해서 wheatherMidLand에 저장
+        (발표날짜 기준 1~4일후의 오전강수확률, 오후 강수확률 데이터는 단기예보로부터 추출해서 wheatherMidLand에 저장)
     */
 
     public void parse(String resData, short regionId) {
@@ -37,13 +37,14 @@ public class WeatherParserForMFL {
     }
 
     private static short[][] buildValueForMFL(JSONObject firstItem) {
-        short[][] value = setFcstDateForMF(new short[4][5]);
+        short[][] value = setFcstDateForMF(new short[2][5]);
 
-        for (int day = 3; day <= 6; day++) {
-            value[day - 3][1] = (short) firstItem.getInt("rnSt" + day + "Am");
-            value[day - 3][2] = (short) firstItem.getInt("rnSt" + day + "Pm");
-            value[day - 3][3] = changeToWeatherCode(firstItem.getString("wf" + day + "Am"));
-            value[day - 3][4] = changeToWeatherCode(firstItem.getString("wf" + day + "Pm"));
+        for (int day = 5; day <= 6; day++) {
+            int idx = day - 5;
+            value[idx][1] = (short) firstItem.getInt("rnSt" + day + "Am");
+            value[idx][2] = (short) firstItem.getInt("rnSt" + day + "Pm");
+            value[idx][3] = changeToWeatherCode(firstItem.getString("wf" + day + "Am"));
+            value[idx][4] = changeToWeatherCode(firstItem.getString("wf" + day + "Pm"));
         }
 
         return value;
@@ -75,13 +76,14 @@ public class WeatherParserForMFL {
     static short[][] setFcstDateForMF(short[][] value){
         LocalDate stdTime = getStdTimeForMF();
 
-        for(int day=3;day<=6;day++){
-            stdTime.plusDays(day); //day일 후의 날짜 계산 for(0731->0803, 1231->0103)
-            short dayAfterN = Short.parseShort(stdTime.format(DateTimeFormatter.ofPattern("MMdd"))); //월일 정보만 추출
-            value[day-3][0] = dayAfterN;
+        for(int day = 5; day <= 6; day++){
+            LocalDate target = stdTime.plusDays(day); // 기준일로부터 day일 후
+            short dayAfterN = Short.parseShort(target.format(DateTimeFormatter.ofPattern("MMdd")));
+            value[day - 5][0] = dayAfterN; // 5일→0, 6일→1
         }
         return value;
     };
+
 
     static LocalDate getStdTimeForMF(){
         LocalDateTime stdTime = LocalDateTime.now();

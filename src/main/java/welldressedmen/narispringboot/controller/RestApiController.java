@@ -34,7 +34,7 @@ public class RestApiController {
     @Value("${app.version}")
     private String latestVersion;
 
-    @PostMapping("users")
+    @PutMapping("users/me")
     public ResponseEntity<ResponseDTO> updateUserInfo(Authentication authentication, @RequestBody UpdateRequestDTO updateRequestDTO) {
         String userId = getAuthenticatedUserId(authentication);
         memberService.updateMemberInfo(updateRequestDTO, userId);
@@ -97,4 +97,7 @@ public class RestApiController {
                 .build();
     }
 
+    @GetMapping("/health")
+    @ResponseStatus(HttpStatus.OK)
+    public void health(){}
 }
